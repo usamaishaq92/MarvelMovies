@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import * as EmailValidator from "email-validator";
+import { Camera, CameraType } from "expo-camera";
 
 function Register() {
   // depend the whole form is filled or not
@@ -19,9 +20,23 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // ref list
+
+  const cameraRef = useRef();
+  const [profilePicUri, setProfilePicUri] = useState("");
+
+  const [type, setType] = useState(CameraType.front);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+
+  requestPermission();
+
   const onSubmitPress = () => {
     alert("hie this an alert from a valid form");
   };
+
+  // component ma lifecycle k dremyan hona wali tbdilian capture ke jaskti hain
+  // useEffect
+  // it has dependceny array (wo apna apko bind kr skti kisi b cheez k sath)
 
   useEffect(() => {
     checkValidForm();
@@ -67,9 +82,38 @@ function Register() {
     setIsValid(true);
   };
 
+  const onTakePicturePress = () => {
+    // check if camera is working not fine then just dont do anything
+    if (cameraRef.current === undefined) {
+      return;
+    }
+
+    cameraRef.current
+      .takePictureAsync()
+      .then((response) => {
+        console.log(response);
+        // check if the path of picture exists then take it to the state
+        if (response.uri !== undefined) {
+          setProfilePicUri(response.uri);
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.form}>
+        <Camera ref={cameraRef} style={styles.camera} type={type}>
+          <View style={styles.cameraButtonView}>
+            <TouchableOpacity onPress={onTakePicturePress}>
+              <View style={styles.cameraButton} />
+            </TouchableOpacity>
+          </View>
+        </Camera>
+
+        <Image style={styles.profilePicImg} source={{ uri: profilePicUri }} />
         <TextInput
           style={styles.inputBox}
           placeholder={"first name"}
