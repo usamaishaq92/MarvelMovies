@@ -10,6 +10,9 @@ import {
 import * as EmailValidator from "email-validator";
 import { Camera, CameraType } from "expo-camera";
 
+import { auth } from "../services/firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
 function Register() {
   // depend the whole form is filled or not
   const [isValid, setIsValid] = useState(false);
@@ -31,7 +34,13 @@ function Register() {
   requestPermission();
 
   const onSubmitPress = () => {
-    alert("hie this an alert from a valid form");
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((response) => {
+        alert("Data Successfully updated to FireBase DB");
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
 
   // component ma lifecycle k dremyan hona wali tbdilian capture ke jaskti hain
