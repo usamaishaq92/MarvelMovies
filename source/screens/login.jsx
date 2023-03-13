@@ -1,11 +1,13 @@
-import { View, StyleSheet, TextInput, Button } from "react-native";
+import { View, StyleSheet, TextInput, Button, Image } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 function Login({ navigation }) {
   const [emailInput, setEmailInput] = useState();
   const [passInput, setPassInput] = useState();
   const [showPassword, setShowPassword] = useState(true);
+  const [imageUri, setImageUri] = useState();
 
   const loginPress = () => {
     navigation.navigate("register");
@@ -17,6 +19,25 @@ function Login({ navigation }) {
     } else {
       setShowPassword(true);
     }
+  };
+
+  const openGallery = () => {
+    ImagePicker.getMediaLibraryPermissionsAsync().then((response) => {
+      console.log("permission granted");
+    });
+
+    ImagePicker.launchImageLibraryAsync({
+      quality: 0.5,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    })
+      .then((response) => {
+        if (response.uri !== undefined) {
+          setImageUri(response.uri);
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
 
   return (
@@ -43,7 +64,9 @@ function Login({ navigation }) {
         </View>
       </View>
       <View style={styles.Button}>
+        <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
         <Button title={"Login"} onPress={loginPress} />
+        <Button title={"Open Gallery"} onPress={openGallery} />
       </View>
     </View>
   );
